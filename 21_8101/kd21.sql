@@ -1,0 +1,1 @@
+SELECT * FROM kd21.general_dialog;
