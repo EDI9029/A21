@@ -1,45 +1,28 @@
 import pymysql
+import dao.properties
 
-def chat(user_input):
-    host = 'localhost'  
-    port = 3306  
-    user = 'root'  
-    password = 'usaac130h41y799q'    
-    db = 'kd21'    
-    charset = 'utf8'  
+database = dao.properties.kd_21
 
-    
+def chat(user_input):   
+    db = pymysql.connect(host=database.get_host(), port= database.get_port(), user=database.get_user(), password=database.get_password(), db=database.get_db(), charset=database.get_charset())
+
     try:
-        db = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset) 
         cursor = db.cursor()  
-
         read = " SELECT speakout FROM general_dialog WHERE reply = %s ;"
-        line = cursor.execute(read, user_input)   
-        data = cursor.fetchall()  
-        
+        cursor.execute(read, user_input)   
+        data = cursor.fetchall()         
         return data
-
     except Exception as msg:
-        return(tuple('你說什麼?',))
+        print(msg)
     finally:
         cursor.close()  
         db.close()  
 
+def memory(userspeak ,reply): 
+    db = pymysql.connect(host=database.get_host(), port= database.get_port(), user=database.get_user(), password=database.get_password(), db=database.get_db(), charset=database.get_charset())
 
-
-def memory(userspeak ,reply):
-    host = 'localhost'  
-    port = 3306  
-    user = 'root'  
-    password = 'usaac130h41y799q'    
-    db = 'kd21'    
-    charset = 'utf8'  
-
-    
     try:
-        db = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset) 
-        cursor = db.cursor()  
-
+        cursor = db.cursor()         
         remember ="INSERT INTO general_dialog (reply, speakout) VALUES (%s, %s) ;"
         cursor.execute(remember, (userspeak, reply) )
         db.commit()
@@ -48,3 +31,18 @@ def memory(userspeak ,reply):
     finally:
         cursor.close() 
         db.close() 
+
+def schedule(weekDay, date):
+    db = pymysql.connect(host=database.get_host(), port= database.get_port(), user=database.get_user(), password=database.get_password(), db=database.get_db(), charset=database.get_charset())
+
+    try:
+        cursor = db.cursor()  
+        read = " SELECT topic FROM schedule WHERE date=%s or date=%s ;"
+        cursor.execute(read, weekDay, date)   
+        data = cursor.fetchall()       
+        return data
+    except Exception as msg:
+        return(tuple('Error'))
+    finally:
+        cursor.close()  
+        db.close()  
